@@ -34,17 +34,17 @@ int	parsemac(unsigned char *, char *);
 int
 main(int argc, char **argv)
 {
-//	struct hostent *he;
-	struct sockaddr_in sin;
-	struct in_addr inaddr;
-	char   *msg;
-	char   *mac = DEFAULTMAC;
-	char   *net = DEFAULTNET;
-	char    macaddr[6];
-	int     sockfd;
-	int     optval = 1;
-	int     i, j;
-	int     msglen = sizeof(macaddr) * 16 + 6;
+//	struct	hostent *he;
+	struct	sockaddr_in sin;
+	struct	in_addr inaddr;
+	char	*msg;
+	char	*mac = DEFAULTMAC;
+	char	*net = DEFAULTNET;
+	unsigned char macaddr[6];
+	int	sockfd;
+	int	optval = 1;
+	int	i, j;
+	int	msglen = sizeof(macaddr) * 16 + 6;
 	
 	msg = malloc(sizeof(char) * msglen);
 	memset(msg, 0xff, 6);
@@ -70,7 +70,7 @@ main(int argc, char **argv)
 }
 
 int
-parsemac(unsigned char * macaddr, char * mac)
+parsemac(unsigned char *macaddr, char *mac)
 {
 	char   *pp;
 	long    l;
