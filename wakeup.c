@@ -15,14 +15,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <err.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <err.h>
+#include <unistd.h>
 
 #define DEFAULTMAC "00:e0:c5:c4:09:f1"
 #define DEFAULTNET "10.0.0.255"
@@ -32,7 +34,7 @@ int	parsemac(unsigned char *, char *);
 int
 main(int argc, char **argv)
 {
-	struct hostent *he;
+//	struct hostent *he;
 	struct sockaddr_in sin;
 	struct in_addr inaddr;
 	char   *msg;
@@ -54,14 +56,14 @@ main(int argc, char **argv)
 	}
 //	he = gethostbyname(net);
 	inet_aton(net, &inaddr);
-	memset(&sin, NULL, sizeof(sin));
+	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 //	sin.sin_addr = *((struct in_addr *) he->h_addr);
 	sin.sin_addr = inaddr;
 	sin.sin_port = htons(7);
-	sockfd = socket(AF_INET, SOCK_DGRAM, NULL);
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval));
-	sendto(sockfd, msg, msglen, NULL, (struct sockaddr *)&sin, sizeof(sin));
+	sendto(sockfd, msg, msglen, 0, (struct sockaddr *)&sin, sizeof(sin));
 	free(msg);
 	close(sockfd);
 	return 0;

@@ -1,7 +1,7 @@
 # $Id$
 
 PROG=		wakeup
-CFLAGS+=	-ggdb
+CFLAGS+=	-ggdb -Wall
 NOMAN=
 
 .include <bsd.prog.mk>
