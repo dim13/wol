@@ -27,7 +27,7 @@
 #include <unistd.h>
 
 #define DEFAULTMAC "00:e0:c5:c4:09:f1"
-#define DEFAULTNET "10.0.0.255"
+#define DEFAULTNET "255.255.255.255"
 
 int	parsemac(unsigned char *, char *);
 
