@@ -1,6 +1,6 @@
 # $Id$
 
-PROG=		wakeup
+PROG=		wol
 CFLAGS+=	-ggdb -Wall
 NOMAN=
 
