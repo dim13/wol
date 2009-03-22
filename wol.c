@@ -27,34 +27,28 @@
 
 char	*bcast = "255.255.255.255";
 
+int	parsemac(char *macaddr, char *s);
+int	spit(char *net, char *msg, int sz);
+int	wol(char *net, char *mac);
+
 int
-parsemac(char *macaddr, char *str)
+parsemac(char *macaddr, char *s)
 {
 	char	*p;
 	int 	i;
 	long	l;
 
 	for (i = 0; i < 6; ++i) {
-		l = strtol(str, &p, 0x10);
+		l = strtol(s, &p, 0x10);
 		macaddr[i] = (char)l;
-		str = p + 1;
+		s = p + 1;
 	}
 
 	return 0;
 }
 
-void
-usage()
-{
-	extern	char *__progname;
-
-	fprintf(stderr, "usage: %s [-n network] mac\n", __progname);
-
-	exit(1);
-}
-
 int
-spit(char *net, char *msg, int len)
+spit(char *net, char *msg, int sz)
 {
 	struct	hostent *he;
 	struct	sockaddr_in sin;
@@ -69,27 +63,52 @@ spit(char *net, char *msg, int len)
 
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
 	setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval));
-	sendto(fd, msg, len, 0, (struct sockaddr *)&sin, sizeof(sin));
+	sendto(fd, msg, sz, 0, (struct sockaddr *)&sin, sizeof(sin));
 	close(fd);
 
 	return 0;
 }
 
 int
-main(int argc, char **argv)
+wol(char *net, char *mac)
 {
 	char	msg[17][6];
 	char	macaddr[6];
-	char	*net, *mac;
-	int	c, i;
+	int	i;
 
-	net = bcast;
-	mac = NULL;
+	mac = strdup(mac);
+	parsemac(macaddr, mac);
+
+	memset(msg[0], 0xff, sizeof(msg[0]));
+	for (i = 0; i < 16; ++i)
+		memcpy(msg[i+1], macaddr, sizeof(macaddr));
+	
+	spit(net, (char *)msg, sizeof(msg));
+	free(mac);
+
+	return 0;
+}
+
+#if 1
+void
+usage()
+{
+	extern	char *__progname;
+
+	fprintf(stderr, "usage: %s [-n network] mac\n", __progname);
+
+	exit(1);
+}
+
+int
+main(int argc, char **argv)
+{
+	int	c;
 
 	while ((c = getopt(argc, argv, "n:")) != -1)
 		switch (c) {
 		case 'n':
-			net = strdup(optarg);
+			bcast = strdup(optarg);
 			break;
 		default:
 			usage();
@@ -101,14 +120,8 @@ main(int argc, char **argv)
 	if (!argc)
 		usage();
 	
-	mac = strdup(*argv);
-	parsemac(macaddr, mac);
-
-	memset(msg[0], 0xff, sizeof(msg[0]));
-	for (i = 0; i < 16; ++i)
-		memcpy(msg[i+1], macaddr, sizeof(macaddr));
+	wol(bcast, *argv);
 	
-	spit(net, (char *)msg, sizeof(msg));
-
 	return 0;
 }
+#endif
