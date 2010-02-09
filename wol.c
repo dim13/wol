@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <assert.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +54,7 @@ spit(char *net, char *msg, int sz)
 	struct	hostent *he;
 	struct	sockaddr_in sin;
 	int	fd;
-	int	optval = 1;
+	int	yes = 1;
 
 	he = gethostbyname(net);
 	memset(&sin, 0, sizeof(sin));
@@ -62,7 +63,8 @@ spit(char *net, char *msg, int sz)
 	sin.sin_port = htons(7);
 
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
-	setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval));
+	assert(fd);
+	setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(yes));
 	sendto(fd, msg, sz, 0, (struct sockaddr *)&sin, sizeof(sin));
 	close(fd);
 
@@ -77,6 +79,7 @@ wol(char *net, char *mac)
 	int	i;
 
 	mac = strdup(mac);
+	assert(mac);
 	parsemac(macaddr, mac);
 
 	memset(msg[0], 0xff, sizeof(msg[0]));
@@ -109,6 +112,7 @@ main(int argc, char **argv)
 		switch (c) {
 		case 'n':
 			bcast = strdup(optarg);
+			assert(bcast);
 			break;
 		default:
 			usage();
