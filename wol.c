@@ -26,14 +26,13 @@
 #include <string.h>
 #include <unistd.h>
 
-char	*bcast = "255.255.255.255";
-
-int	parsemac(char *macaddr, char *s);
-int	spit(char *net, char *msg, int sz);
+int	parse(char *macaddr, char *s);
+int	emit(char *net, char *msg, size_t sz);
 int	wol(char *net, char *mac);
+void	usage(void) __attribute__((noreturn));
 
 int
-parsemac(char *macaddr, char *s)
+parse(char *macaddr, char *s)
 {
 	char	*p;
 	int 	i;
@@ -49,7 +48,7 @@ parsemac(char *macaddr, char *s)
 }
 
 int
-spit(char *net, char *msg, int sz)
+emit(char *net, char *msg, size_t sz)
 {
 	struct	hostent *he;
 	struct	sockaddr_in sin;
@@ -80,19 +79,18 @@ wol(char *net, char *mac)
 
 	mac = strdup(mac);
 	assert(mac);
-	parsemac(macaddr, mac);
+	parse(macaddr, mac);
 
 	memset(msg[0], 0xff, sizeof(msg[0]));
 	for (i = 0; i < 16; ++i)
 		memcpy(msg[i+1], macaddr, sizeof(macaddr));
 	
-	spit(net, (char *)msg, sizeof(msg));
+	emit(net, (char *)msg, sizeof(msg));
 	free(mac);
 
 	return 0;
 }
 
-#if 1
 void
 usage()
 {
@@ -106,6 +104,7 @@ usage()
 int
 main(int argc, char **argv)
 {
+	char	*bcast = "255.255.255.255";
 	int	c;
 
 	while ((c = getopt(argc, argv, "n:")) != -1)
@@ -128,4 +127,3 @@ main(int argc, char **argv)
 	
 	return 0;
 }
-#endif
